@@ -960,4 +960,368 @@ Las simulaciones de respuesta al escalón mostraron que ambas entradas generan r
 Por lo tanto, el sistema original no es asintóticamente estable.
 
 Este comportamiento permite identificar la necesidad de incorporar una estrategia de control que modifique la dinámica del sistema, como la realimentación de estados que se estudia en el ejercicio siguiente.
+% ===== EJERCICIO 7 =====
+\section*{Ejercicio 7}
+\begin{figure}[H] \centering \includegraphics[width=\textwidth]{Imagenes/Ej7.png} \caption{Enunciado del Ejercicio 7.} \label{fig:enunciado_ej7} \end{figure}
+Se busca controlar el nivel de glucosa en sangre mediante realimentación de estados, de modo que el sistema a lazo cerrado tenga una relación de amortiguamiento $\xi=0{,}707$ y una frecuencia natural $\omega_n=100\ \mathrm{rad/s}$.
+
+La planta es:
+
+\begin{equation}G(s)=\frac{Y(s)}{U(s)}=\frac{10175(s+0{,}916)}{(s+0{,}127)(s+2{,}69)(s+25)}\end{equation}
+% ===== ESPECIFICACIONES =====
+\subsection*{Especificaciones y polos deseados}
+A partir de los parámetros pedidos:
+
+\begin{equation}\sigma=\xi\omega_n=0{,}707\cdot100=70{,}7\end{equation}
+
+\begin{equation}\omega_d=\omega_n\sqrt{1-\xi^2}=100\sqrt{1-0{,}707^2}\approx70{,}72\end{equation}
+
+Por lo tanto, los polos dominantes deseados son:
+
+\begin{equation}\boxed{p_{1,2}=-\sigma\pm j\omega_d=-70{,}7\pm j70{,}72}\end{equation}
+
+El sobrepico y el tiempo de establecimiento del sistema de segundo orden correspondiente son:
+
+\begin{equation}M_P=e^{-\xi\pi/\sqrt{1-\xi^2}}\approx4{,}3\,\text{\%}\end{equation}
+
+\begin{equation}t_s\approx\frac{4}{\sigma}=\frac{4}{70{,}7}\approx0{,}057\ \mathrm{s}\end{equation}
+
+El enunciado indica $t_s\approx0{,}6$ s, pero con $\sigma=70{,}7$ se obtiene $t_s\approx0{,}06$ s, por lo que se interpreta como un error de tipeo.
+
+El polinomio de segundo orden asociado es:
+
+\begin{equation}s^2+2\xi\omega_ns+\omega_n^2=s^2+141{,}4s+10000\end{equation}
+% ===== ANALISIS DE LA PLANTA =====
+\subsection*{Análisis de la planta}
+\begin{itemize}
+\item Polos: $-0{,}127$, $-2{,}69$ y $-25$. Todos se encuentran en el semiplano izquierdo, por lo que la planta es estable.
+\item Cero: $-0{,}916$. Se encuentra muy cerca del origen en comparación con los polos deseados ($-70{,}7$), por lo que es un \textbf{cero dominante}. La realimentación de estados no modifica los ceros, de modo que este cero seguirá presente a lazo cerrado y deformará la respuesta si no se lo neutraliza.
+\item La planta es de \textbf{tipo cero}, ya que no posee polos en el origen.
+\end{itemize}
+
+Su ganancia estática es:
+
+\begin{equation}G(0)=\frac{10175\cdot0{,}916}{0{,}127\cdot2{,}69\cdot25}\approx1091\end{equation}
+% ===== MODELO DE ESTADO =====
+\subsection*{Modelo de estado}
+\subsubsection*{Separación en bloques}
+Cada polo se ubica en un bloque independiente, dejando el cero y la ganancia a la salida. Las variables de estado son las salidas de cada bloque, numeradas desde la salida:
+
+\begin{equation}U\rightarrow\boxed{\frac{1}{s+25}}\xrightarrow{X_3}\boxed{\frac{1}{s+2{,}69}}\xrightarrow{X_2}\boxed{\frac{1}{s+0{,}127}}\xrightarrow{X_1}\boxed{10175(s+0{,}916)}\rightarrow Y\end{equation}
+\subsubsection*{Obtención de las ecuaciones de estado}
+\paragraph{Primera etapa: bloque $\boldsymbol{1/(s+25)}$.} Del diagrama:
+
+\begin{equation}X_3(s)=U(s)\frac{1}{s+25}\end{equation}
+
+Reordenando:
+
+\begin{equation}sX_3(s)+25X_3(s)=U(s)\end{equation}
+
+Aplicando transformada inversa de Laplace, con condiciones iniciales nulas:
+
+\begin{equation}\boxed{\dot{x}_3=-25x_3+u}\end{equation}
+\paragraph{Segunda etapa: bloque $\boldsymbol{1/(s+2{,}69)}$.} Del diagrama:
+
+\begin{equation}X_2(s)=X_3(s)\frac{1}{s+2{,}69}\end{equation}
+
+Reordenando:
+
+\begin{equation}sX_2(s)+2{,}69X_2(s)=X_3(s)\end{equation}
+
+Aplicando transformada inversa de Laplace:
+
+\begin{equation}\boxed{\dot{x}_2=-2{,}69x_2+x_3}\end{equation}
+\paragraph{Tercera etapa: bloque $\boldsymbol{1/(s+0{,}127)}$.} Del diagrama:
+
+\begin{equation}X_1(s)=X_2(s)\frac{1}{s+0{,}127}\end{equation}
+
+Reordenando:
+
+\begin{equation}sX_1(s)+0{,}127X_1(s)=X_2(s)\end{equation}
+
+Aplicando transformada inversa de Laplace:
+
+\begin{equation}\boxed{\dot{x}_1=-0{,}127x_1+x_2}\end{equation}
+\paragraph{Ecuación de salida.} El último bloque contiene el cero y la ganancia:
+
+\begin{equation}Y(s)=10175(s+0{,}916)X_1(s)\end{equation}
+
+En el dominio temporal:
+
+\begin{equation}y=10175\dot{x}_1+9320{,}3x_1\end{equation}
+
+En la ecuación de salida no puede aparecer una derivada, por lo que se reemplaza $\dot{x}_1=x_2-0{,}127x_1$:
+
+\begin{equation}y=10175(x_2-0{,}127x_1)+9320{,}3x_1\end{equation}
+
+Por lo tanto:
+
+\begin{equation}\boxed{y=8028{,}1x_1+10175x_2}\end{equation}
+
+El numerador de la planta queda contenido únicamente en la ecuación de salida.
+\subsubsection*{Representación matricial}
+Escribiendo las ecuaciones en forma matricial:
+
+\begin{equation}\begin{bmatrix}\dot{x}_1\\\dot{x}_2\\\dot{x}_3\end{bmatrix}=\begin{bmatrix}-0{,}127&1&0\\0&-2{,}69&1\\0&0&-25\end{bmatrix} \begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}+\begin{bmatrix}0\\0\\1\end{bmatrix}u\end{equation}
+
+\begin{equation}y=\begin{bmatrix}8028{,}1&10175&0\end{bmatrix} \begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}+0u\end{equation}
+
+Por lo tanto:
+
+\begin{equation}\boxed{A=\begin{bmatrix}-0{,}127&1&0\\0&-2{,}69&1\\0&0&-25\end{bmatrix} \qquad B=\begin{bmatrix}0\\0\\1\end{bmatrix}}\end{equation}
+
+\begin{equation}\boxed{C=\begin{bmatrix}8028{,}1&10175&0\end{bmatrix} \qquad D=0}\end{equation}
+\paragraph{Verificación.} Calculando $G(s)=C(sI-A)^{-1}B+D$ se obtiene:
+
+\begin{equation}G(s)=\frac{10175s+9320{,}3}{s^3+27{,}817s^2+70{,}767s+8{,}541}=\frac{10175(s+0{,}916)}{(s+0{,}127)(s+2{,}69)(s+25)}\end{equation}
+
+que coincide con la función de transferencia original.
+% ===== NECESIDAD DE LA EXPANSION =====
+\subsection*{Limitación de la realimentación de estados simple}
+Con la ley de control vista en clase:
+
+\begin{equation}u=r-K_1x_1-K_2x_2-K_3x_3=r-Kx\end{equation}
+
+se pueden ubicar los tres polos de la planta. Si se eligen en $-70{,}7\pm j70{,}72$ y $-0{,}916$ (este último para cancelar el cero), el lazo cerrado resulta:
+
+\begin{equation}T(s)=\frac{10175(s+0{,}916)}{(s^2+141{,}4s+10000)(s+0{,}916)}\end{equation}
+
+Su valor en régimen permanente es:
+
+\begin{equation}T(0)=\frac{9320{,}3}{0{,}916\cdot10000}=1{,}0175\end{equation}
+
+Ante un escalón unitario la salida se establece en $1{,}0175$: el error de estado estacionario no es nulo. Esto se debe a que, con $u=r-Kx$, la referencia ingresa sin compararse con la salida, y nada garantiza que $y$ alcance a $r$.
+
+Lo mismo ocurre en el ejercicio del cohete X15 visto en clase: allí se cancela el cero en $-0{,}4$ ubicando un polo de lazo cerrado sobre él, y la respuesta adopta la forma de segundo orden buscada, pero se establece en $T(0)=2/9\approx0{,}222$.
+
+Para que la salida siga a la referencia se incorpora un integrador del error, es decir, se \textbf{expande} el sistema.
+% ===== EXPANSION =====
+\subsection*{Expansión del sistema}
+Se agrega una cuarta variable de estado, que acumula el error entre la referencia y la salida:
+
+\begin{equation}\dot{x}_4=r-y\end{equation}
+
+Reemplazando la ecuación de salida:
+
+\begin{equation}\boxed{\dot{x}_4=r-8028{,}1x_1-10175x_2}\end{equation}
+
+La ley de control pasa a ser:
+
+\begin{equation}\boxed{u=K_4x_4-K_1x_1-K_2x_2-K_3x_3}\end{equation}
+
+El término $-K_1x_1-K_2x_2-K_3x_3$ es la realimentación de estados, que permite ubicar los polos. El término $K_4x_4$ corrige según el error acumulado: en régimen permanente $\dot{x}_4=0$, por lo que $r-y=0$ y la salida alcanza exactamente a la referencia.
+
+La referencia $r$ ya no ingresa directamente en $u$, sino a través del integrador.
+\subsubsection*{Ecuaciones de lazo cerrado}
+Se reemplaza $u$ en la ecuación de $x_3$:
+
+\begin{equation}\dot{x}_3=-25x_3+K_4x_4-K_1x_1-K_2x_2-K_3x_3\end{equation}
+
+Agrupando:
+
+\begin{equation}\dot{x}_3=-K_1x_1-K_2x_2-(25+K_3)x_3+K_4x_4\end{equation}
+
+El sistema completo queda:
+
+\begin{equation}\boxed{\begin{cases}\dot{x}_1=-0{,}127x_1+x_2\\\dot{x}_2=-2{,}69x_2+x_3\\\dot{x}_3=-K_1x_1-K_2x_2-(25+K_3)x_3+K_4x_4\\\dot{x}_4=-8028{,}1x_1-10175x_2+r\end{cases}}\end{equation}
+\subsubsection*{Matriz de lazo cerrado}
+Escribiendo las ecuaciones en forma matricial:
+
+\begin{equation}\boxed{A_{LC}=\begin{bmatrix}-0{,}127&1&0&0\\0&-2{,}69&1&0\\-K_1&-K_2&-(25+K_3)&K_4\\-8028{,}1&-10175&0&0\end{bmatrix}}\end{equation}
+
+\begin{equation}\dot{x}=A_{LC}x+\begin{bmatrix}0\\0\\0\\1\end{bmatrix}r \qquad y=\begin{bmatrix}8028{,}1&10175&0&0\end{bmatrix}x\end{equation}
+
+En forma de bloques:
+
+\begin{equation}A_{LC}=\begin{bmatrix}A-BK&BK_4\\-C&0\end{bmatrix}\end{equation}
+
+La fila agregada es $-C$: el numerador de la planta ingresa a la matriz a través del integrador.
+% ===== CONTROLABILIDAD =====
+\subsection*{Controlabilidad}
+Antes de ubicar los polos se verifica que el sistema expandido sea controlable mediante el test de Kalman:
+
+\begin{equation}A_e=\begin{bmatrix}A&0\\-C&0\end{bmatrix} \qquad B_e=\begin{bmatrix}B\\0\end{bmatrix}\end{equation}
+
+\begin{equation}M_C=\begin{bmatrix}B_e&A_eB_e&A_e^2B_e&A_e^3B_e\end{bmatrix}\end{equation}
+
+Calculando:
+
+\begin{equation}M_C=\begin{bmatrix}0&0&1&-27{,}817\\0&1&-27{,}69&699{,}49\\1&-25&625&-15625\\0&0&-10175&273717{,}7\end{bmatrix}\end{equation}
+
+\begin{equation}\boxed{|M_C|=9320{,}3\neq0}\end{equation}
+
+Por lo tanto, el sistema expandido es completamente controlable y pueden ubicarse sus cuatro polos.
+% ===== ECUACION CARACTERISTICA =====
+\subsection*{Ecuación característica}
+Se calcula $|sI-A_{LC}|$:
+
+\begin{equation}sI-A_{LC}=\begin{bmatrix}s+0{,}127&-1&0&0\\0&s+2{,}69&-1&0\\K_1&K_2&s+25+K_3&-K_4\\8028{,}1&10175&0&s\end{bmatrix}\end{equation}
+
+Se desarrolla por la cuarta columna, que posee dos ceros. Los signos de los cofactores siguen el patrón:
+
+\begin{equation}\begin{bmatrix}+&-&+&-\\-&+&-&+\\+&-&+&-\\-&+&-&+\end{bmatrix}\end{equation}
+\paragraph{Término del elemento $\boldsymbol{(4,4)=s}$, signo $+$.} Se elimina la fila 4 y la columna 4:
+
+\begin{equation}s\cdot\begin{vmatrix}s+0{,}127&-1&0\\0&s+2{,}69&-1\\K_1&K_2&s+25+K_3\end{vmatrix}\end{equation}
+
+Desarrollando por la primera columna:
+
+\begin{equation}(s+0{,}127)\left[(s+2{,}69)(s+25+K_3)+K_2\right]+K_1\end{equation}
+
+Como $(s+0{,}127)(s+2{,}69)=s^2+2{,}817s+0{,}3416$:
+
+\begin{equation}s^3+(27{,}817+K_3)s^2+(70{,}767+2{,}817K_3+K_2)s+(8{,}541+0{,}3416K_3+0{,}127K_2+K_1)\end{equation}
+\paragraph{Término del elemento $\boldsymbol{(3,4)=-K_4}$, signo $-$.} Se elimina la fila 3 y la columna 4:
+
+\begin{equation}-(-K_4)\cdot\begin{vmatrix}s+0{,}127&-1&0\\0&s+2{,}69&-1\\8028{,}1&10175&0\end{vmatrix}\end{equation}
+
+Desarrollando por la tercera columna, solo aporta el elemento $(2,3)=-1$, con signo $-$:
+
+\begin{equation}-(-1)\begin{vmatrix}s+0{,}127&-1\\8028{,}1&10175\end{vmatrix}=10175(s+0{,}127)+8028{,}1=10175s+9320{,}3\end{equation}
+
+que es el numerador de la planta. Este término vale $K_4(10175s+9320{,}3)$.
+\paragraph{Resultado.} Sumando ambos términos:
+
+\begin{equation}\boxed{\begin{aligned}|sI-A_{LC}|={}&s^4+(27{,}817+K_3)s^3+(70{,}767+2{,}817K_3+K_2)s^2\\&+(8{,}541+0{,}3416K_3+0{,}127K_2+K_1+10175K_4)s+9320{,}3K_4\end{aligned}}\end{equation}
+% ===== ELECCION DE POLOS =====
+\subsection*{Elección de los polos de lazo cerrado}
+Como $A_{LC}$ es de $4\times4$, deben ubicarse cuatro polos:
+
+\begin{itemize}
+\item $-70{,}7\pm j70{,}72$: cumplen $\xi=0{,}707$ y $\omega_n=100$, según lo pedido por el enunciado.
+\item $-0{,}916$: coincide con el cero de la planta y lo cancela en la transferencia de lazo cerrado. Es el ``polo extra'' que menciona el enunciado.
+\item $-700$: polo sobrante de la expansión. Se ubica aproximadamente diez veces más lejos del eje imaginario que la parte real de los polos dominantes ($10\cdot70{,}7\approx700$), para que su modo se extinga rápidamente y no afecte la respuesta.
+\end{itemize}
+
+No es posible igualar utilizando solo tres polos, ya que la ecuación característica es de grado cuatro y existen cuatro incógnitas. Tampoco conviene utilizar un polo de la planta como $-25$, ya que se encuentra más cerca del eje imaginario que $-70{,}7$ y pasaría a dominar la respuesta.
+
+El polinomio deseado es:
+
+\begin{equation}P_d(s)=(s^2+141{,}4s+10000)(s+0{,}916)(s+700)\end{equation}
+
+Multiplicando primero los factores reales:
+
+\begin{equation}(s+0{,}916)(s+700)=s^2+700{,}916s+641{,}2\end{equation}
+
+Por lo tanto:
+
+\begin{equation}P_d(s)=(s^2+141{,}4s+10000)(s^2+700{,}916s+641{,}2)\end{equation}
+
+\begin{equation}\boxed{P_d(s)=s^4+842{,}316s^3+109750{,}7s^2+7099825{,}7s+6412000}\end{equation}
+% ===== CALCULO DE GANANCIAS =====
+\subsection*{Cálculo de las ganancias}
+Se igualan los coeficientes de $|sI-A_{LC}|$ y $P_d(s)$, comenzando por el término independiente, que contiene una única incógnita.
+\paragraph{Término $\boldsymbol{s^0}$.}
+
+\begin{equation}9320{,}3K_4=6412000\Rightarrow\boxed{K_4=687{,}96}\end{equation}
+\paragraph{Término $\boldsymbol{s^3}$.}
+
+\begin{equation}27{,}817+K_3=842{,}316\Rightarrow\boxed{K_3=814{,}50}\end{equation}
+\paragraph{Término $\boldsymbol{s^2}$.}
+
+\begin{equation}70{,}767+2{,}817\cdot814{,}50+K_2=109750{,}7\end{equation}
+
+\begin{equation}70{,}767+2294{,}4+K_2=109750{,}7\Rightarrow\boxed{K_2=107385{,}5}\end{equation}
+\paragraph{Término $\boldsymbol{s^1}$.} Se utiliza que $10175K_4=6412000/0{,}916=7000000$, ya que $9320{,}3=10175\cdot0{,}916$:
+
+\begin{equation}8{,}541+0{,}3416\cdot814{,}50+0{,}127\cdot107385{,}5+K_1+7000000=7099825{,}7\end{equation}
+
+\begin{equation}8{,}541+278{,}3+13638{,}0+K_1+7000000=7099825{,}7\Rightarrow\boxed{K_1=85900{,}9}\end{equation}
+
+Por lo tanto, la ley de control resulta:
+
+\begin{equation}\boxed{u=687{,}96x_4-85900{,}9x_1-107385{,}5x_2-814{,}50x_3}\end{equation}
+% ===== VERIFICACIONES =====
+\subsection*{Verificaciones}
+\subsubsection*{Autovalores de la matriz de lazo cerrado}
+Reemplazando las ganancias:
+
+\begin{equation}A_{LC}=\begin{bmatrix}-0{,}127&1&0&0\\0&-2{,}69&1&0\\-85900{,}9&-107385{,}5&-839{,}50&687{,}96\\-8028{,}1&-10175&0&0\end{bmatrix}\end{equation}
+
+Sus autovalores son:
+
+\begin{equation}\boxed{\lambda_{1,2}=-70{,}7\pm j70{,}72,\qquad \lambda_3=-0{,}916,\qquad \lambda_4=-700}\end{equation}
+
+que coinciden con los polos elegidos.
+\subsubsection*{Transferencia de lazo cerrado}
+\begin{equation}T(s)=\frac{K_4(10175s+9320{,}3)}{|sI-A_{LC}|}=\frac{7000000(s+0{,}916)}{(s^2+141{,}4s+10000)(s+0{,}916)(s+700)}\end{equation}
+
+El factor $(s+0{,}916)$ se cancela, por lo que el cero dominante deja de afectar la respuesta:
+
+\begin{equation}\boxed{T(s)=\frac{7000000}{(s^2+141{,}4s+10000)(s+700)}}\end{equation}
+
+Como el polo en $-700$ está alejado, el sistema se comporta como el segundo orden buscado. Además:
+
+\begin{equation}T(0)=\frac{7000000}{10000\cdot700}=1\end{equation}
+
+por lo que el error de estado estacionario al escalón es nulo.
+\subsubsection*{Estabilidad por Routh-Hurwitz}
+Para el polinomio característico obtenido:
+
+\begin{equation}\begin{array}{c|ccc}s^4&1&109750{,}7&6412000\\s^3&842{,}316&7099825{,}7&0\\s^2&101321{,}8&6412000&\\s^1&7046521{,}0&&\\s^0&6412000&&\end{array}\end{equation}
+
+No hay cambios de signo en la primera columna, por lo que el sistema a lazo cerrado es estable, como era de esperar al haber ubicado todos los polos en el semiplano izquierdo.
+\subsubsection*{Respuesta al escalón}
+Descomponiendo $T(s)/s$ en fracciones parciales y antitransformando, la respuesta al escalón unitario es:
+
+\begin{equation}\boxed{y(t)=1-0{,}0249e^{-700t}-e^{-70{,}7t}\left[0{,}9751\cos(70{,}72t)+1{,}2216\sin(70{,}72t)\right]}\end{equation}
+
+Para comparar, el segundo orden ideal y el diseño sin integrador ($u=r-Kx$) responden según:
+
+\begin{equation}y_{\mathrm{ideal}}(t)=1-e^{-70{,}7t}\left[\cos(70{,}72t)+0{,}9997\sin(70{,}72t)\right]\end{equation}
+
+\begin{equation}y_{\mathrm{sin\ int}}(t)=1{,}0175\,y_{\mathrm{ideal}}(t)\end{equation}
+
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=0.9\textwidth, height=7cm, xlabel={Tiempo (ms)}, ylabel={Salida $y(t)$}, title={Respuesta al escalón unitario}, xmin=0, xmax=150, ymin=0, ymax=1.12, grid=both, major grid style={gray!35}, minor grid style={gray!15}, legend pos=south east, line width=1pt, trig format plots=rad]
+\addplot[blue, thick, domain=0:150, samples=300]{1-0.02494*exp(-0.7*x)-exp(-0.0707*x)*(0.97506*cos(0.07072*x)+1.22159*sin(0.07072*x))};\addlegendentry{Diseño con integrador}
+\addplot[black, dashed, domain=0:150, samples=300]{1-exp(-0.0707*x)*(cos(0.07072*x)+0.9997*sin(0.07072*x))};\addlegendentry{Segundo orden ideal}
+\addplot[red, dotted, thick, domain=0:150, samples=300]{1.0175*(1-exp(-0.0707*x)*(cos(0.07072*x)+0.9997*sin(0.07072*x)))};\addlegendentry{Sin integrador ($u=r-Kx$)}
+\end{axis}\end{tikzpicture}\caption{Respuesta al escalón unitario del diseño, del segundo orden ideal y del diseño sin integrador.}\end{figure}
+
+Los valores obtenidos son:
+
+\begin{table}[H]\centering\begin{tabular}{lccc}\hline & Diseño & Segundo orden ideal & Sin integrador\\\hline Sobrepico $M_P$ & $4{,}28\,\text{\%}$ & $4{,}33\,\text{\%}$ & --- \\ Tiempo de pico $t_p$ & $46$ ms & $44$ ms & --- \\ Tiempo de establecimiento $t_s$ ($2\,\text{\%}$) & $61$ ms & $60$ ms & --- \\ Valor final & $1$ & $1$ & $1{,}0175$\\ Error de estado estacionario & $0$ & $0$ & $-1{,}75\,\text{\%}$\\\hline\end{tabular}\caption{Parámetros de la respuesta al escalón.}\end{table}
+
+El diseño reproduce prácticamente la respuesta del segundo orden ideal, y el integrador elimina el error que presenta la versión sin expansión.
+\subsubsection*{Influencia del cuarto polo}
+Si el cuarto polo se ubica en $-350$ (cinco veces la parte real dominante), las ganancias resultan:
+
+\begin{equation}K_1=46888{,}4 \qquad K_2=58560{,}9 \qquad K_3=464{,}50 \qquad K_4=343{,}98\end{equation}
+
+y la respuesta al escalón es:
+
+\begin{equation}y(t)=1-0{,}1205e^{-350t}-e^{-70{,}7t}\left[0{,}8795\cos(70{,}72t)+1{,}4755\sin(70{,}72t)\right]\end{equation}
+
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=0.9\textwidth, height=7cm, xlabel={Tiempo (ms)}, ylabel={Salida $y(t)$}, title={Comparación según la ubicación del cuarto polo}, xmin=0, xmax=150, ymin=0, ymax=1.12, grid=both, major grid style={gray!35}, minor grid style={gray!15}, legend pos=south east, line width=1pt, trig format plots=rad]
+\addplot[blue, thick, domain=0:150, samples=300]{1-0.02494*exp(-0.7*x)-exp(-0.0707*x)*(0.97506*cos(0.07072*x)+1.22159*sin(0.07072*x))};\addlegendentry{$p_4=-700$}
+\addplot[orange, thick, dashed, domain=0:150, samples=300]{1-0.12047*exp(-0.35*x)-exp(-0.0707*x)*(0.87953*cos(0.07072*x)+1.47546*sin(0.07072*x))};\addlegendentry{$p_4=-350$}
+\end{axis}\end{tikzpicture}\caption{Respuesta al escalón para dos ubicaciones del cuarto polo.}\end{figure}
+
+Con $p_4=-350$ las ganancias se reducen aproximadamente a la mitad, con un sobrepico de $4{,}10\,\text{\%}$ y $t_s\approx63$ ms. La respuesta prácticamente no cambia, por lo que la elección del cuarto polo es un compromiso entre su influencia en la respuesta y el esfuerzo de control.
+\subsubsection*{Señal de control}
+La transferencia entre la referencia y la entrada a la planta es:
+
+\begin{equation}\frac{U(s)}{R(s)}=\frac{T(s)}{G(s)}=\frac{K_4(s+0{,}127)(s+2{,}69)(s+25)}{P_d(s)}\end{equation}
+
+Antitransformando la respuesta al escalón:
+
+\begin{equation}\begin{aligned}u(t)={}&0{,}000916+0{,}00367e^{-0{,}916t}-1{,}1548e^{-700t}\\&+e^{-70{,}7t}\left[1{,}1503\cos(70{,}72t)-0{,}5528\sin(70{,}72t)\right]\end{aligned}\end{equation}
+
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=0.9\textwidth, height=6.5cm, xlabel={Tiempo (ms)}, ylabel={Entrada $u(t)$}, title={Señal de control ante un escalón en la referencia}, xmin=0, xmax=150, grid=both, major grid style={gray!35}, minor grid style={gray!15}, legend pos=north east, line width=1pt, trig format plots=rad]
+\addplot[blue, thick, domain=0:150, samples=400]{0.000916+0.003669*exp(-0.000916*x)-1.15483*exp(-0.7*x)+exp(-0.0707*x)*(1.15025*cos(0.07072*x)-0.55282*sin(0.07072*x))};\addlegendentry{$p_4=-700$}
+\end{axis}\end{tikzpicture}\caption{Dosis de glucosa aplicada a la planta ante un escalón unitario en la referencia.}\end{figure}
+
+La cancelación del polo en $-0{,}916$ ocurre en la transferencia $r\rightarrow y$, pero no en $r\rightarrow u$. Por ese motivo $u(t)$ presenta una componente lenta, con constante de tiempo $\tau\approx1/0{,}916\approx1{,}1$ s, que tiende a $u_{ss}=1/G(0)\approx9{,}2\cdot10^{-4}$. La salida no la percibe, pero constituye un modo interno del sistema.
+% ===== CONCLUSIONES =====
+\subsection*{Conclusiones}
+La realimentación de estados permite ubicar los polos del sistema en cualquier posición, pero no modifica los ceros de la planta. El cero dominante en $-0{,}916$ se neutralizó ubicando un polo de lazo cerrado sobre él.
+
+Como ocurre en el ejercicio del cohete X15, la ley de control $u=r-Kx$ deja un error de estado estacionario ($y_{ss}=1{,}0175$). La expansión del sistema mediante un integrador del error ($\dot{x}_4=r-y$) lo elimina.
+
+El sistema expandido resulta de orden cuatro: dos polos para el par complejo dominante, uno para cancelar el cero y uno libre, ubicado lejos del eje imaginario. Las ganancias obtenidas son:
+
+\begin{equation}\boxed{K_1=85900{,}9 \qquad K_2=107385{,}5 \qquad K_3=814{,}50 \qquad K_4=687{,}96}\end{equation}
+
+Las simulaciones confirman un sobrepico de $4{,}3\,\text{\%}$, un tiempo de establecimiento de $0{,}06$ s y error de estado estacionario nulo, y el criterio de Routh-Hurwitz confirma la estabilidad del sistema a lazo cerrado.
+
 \end{document}
